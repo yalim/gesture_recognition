@@ -27,40 +27,6 @@ if __name__ == '__main__':
             for b1 in b1_list:
                 for b2 in b2_list:
                     for lr in lr_list:
-    # Import the datas and seperate training vs test
-    # split_data(0.2, 0.2)
-    # y = load_data('labels')
-    # split_index = int(np.ceil(test_ratio * len(y)))
-    # user_ids = load_data('user_ids')
-
-    # x_accel = load_data('x_acc_noise').reshape((y.shape[0], 100, 1))
-    # y_accel = load_data('y_acc_noise').reshape((y.shape[0], 100, 1))
-    # z_accel = load_data('z_acc_noise').reshape((y.shape[0], 100, 1))
-    # x_gyro = load_data('x_gyr_noise').reshape((y.shape[0], 100, 1))
-    # y_gyro = load_data('y_gyr_noise').reshape((y.shape[0], 100, 1))
-    # z_gyro = load_data('z_gyr_noise').reshape((y.shape[0], 100, 1))
-
-    # Split test and training data
-
-    # x_accel_test = x_accel[split_index:, :]
-    # print x_accel_test.shape
-    # y_accel_test = y_accel[split_index:, :]
-    # z_accel_test = z_accel[split_index:, :]
-    # x_gyro_test = x_gyro[split_index:, :]
-    # y_gyro_test = y_gyro[split_index:, :]
-    # z_gyro_test = z_gyro[split_index:, :]
-    # y_test = y[split_index:]
-    # user_ids_test = user_ids[split_index:]
-
-    # x_accel = x_accel[:split_index, :]
-    # y_accel = y_accel[:split_index, :]
-    # z_accel = z_accel[:split_index, :]
-    # x_gyro = x_gyro[:split_index, :]
-    # y_gyro = y_gyro[:split_index, :]
-    # z_gyro = z_gyro[:split_index, :]
-    # y = y[:split_index]
-    # user_ids = user_ids[:split_index]
-
                         model_x_acc = Sequential()
                         model_x_acc.add(LSTM(N_LSTM, input_shape=(100, 1)))
                         model_y_acc = Sequential()
@@ -149,6 +115,9 @@ if __name__ == '__main__':
                         with open('accuracies.csv', 'a') as gdata:
                             np.savetxt(gdata, acc_list2, delimiter=',', fmt='%d %d %3f %3f %3f %3f %3f %3f')
                         gdata.close()
+
+                        final_model.save('gr_keras_lstm_dense_'+str(N_LSTM)+'_'+str(N_dense)+'_'+str(b1)+'_'+str(b2)+'_'+str(lr)+'h5')
+
 
     # print 'Trained Users: ', set(user_ids)
     # print 'Test Users: ', set(user_ids_test)
