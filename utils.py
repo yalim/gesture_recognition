@@ -53,6 +53,9 @@ class fifo_array():
         self.arr2 = np.delete(self.arr2, 0, 0)
         self.arr = np.reshape(self.arr2, self.arr.shape)
 
+    def get_value(self):
+        return self.arr
+
     def change_length(self, new_length):
         """
             This function adds zero to the end when increasing the length and
@@ -69,3 +72,9 @@ class fifo_array():
             self.arr4 = np.delete(self.arr, x, 1)
             self.arr = self.arr4
             self.max_len = new_length
+
+if __name__ == '__main__':
+    x = fifo_array(10)
+    for a in range(20):
+        x.add_element(a)
+        print x.get_value()

@@ -1,13 +1,13 @@
 import theano
 import theano.tensor as T
 import numpy as np
-from sklearn.metrics import confusion_matrix, accuracy_score, recall_score
+from sklearn.metrics import confusion_matrix, accuracy_score
 import time
 from sklearn.utils import shuffle
 import matplotlib.pyplot as plt
 from six.moves import cPickle
-
-# TODO: save and load weights
+# TODO: Input = 6
+# TODO: Validation for early stopping and parameters
 
 
 def init_weight(Mi, Mo):
@@ -107,7 +107,6 @@ class RNN:
             momentum=0.99,
             temperature=None):
         N, D = X.shape
-        print 'ND', N, D
         V = len(set(Y))
 
         self.hidden_layers = []
@@ -116,6 +115,11 @@ class RNN:
             lstm = LSTM(Mi, Mo, activation)
             self.hidden_layers.append(lstm)
             Mi = Mo
+
+        # for Mo in self.hidden_layer_sizes:
+        #     hu = HiddenLayer(Mi, Mo, 1)
+        #     self.hidden_layers.append(hu)
+        #     Mi = Mo
 
         Wo = init_weight(Mi, V)
         bo = np.zeros(V)
@@ -167,14 +171,6 @@ class RNN:
         y_hat = self.forward(X)
         return T.argmax(y_hat, axis=1)
 
-    # def save(self, filename):
-    #     np.savez(filename, *p.get_value() for p in self.params)
-
-    # def set(self):
-    #     pass
-
-    # def load(self):
-    #     pass
 
 if __name__ == '__main__':
     x = np.genfromtxt('./GestureDataset_Padded.csv', delimiter=',')
@@ -184,17 +180,19 @@ if __name__ == '__main__':
     print len(yis)
     xis = x[:, 2:]
 
-    xis, yis = shuffle(xis, yis)
+    # xis, yis = shuffle(xis, yis)
+    # xis = xis.reshape(len(xis), 6, 100)
 
-    x_train = xis[:800]
+    x_train = xis[:800, :]
+    print x_train.shape
     y_train = yis[:800]
-    x_test = xis[801:]
+    x_test = xis[801:, :]
     y_test = yis[801:]
 
     start_time = time.time()
 
     rnn = RNN([200])
-    rnn.fit(x_train, y_train, epochs=10)
+    rnn.fit(x_train, y_train, epochs=100, batch_size=100)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     print 'Training Completed.'
@@ -221,10 +219,10 @@ if __name__ == '__main__':
     print '--'
     print confusion_matrix(y_test, predictions_loaded.eval())
     print 'Accuracy: ', accuracy_score(y_test, predictions.eval())
-    print 'Recall: ', recall_score(y_test, predictions.eval())
+    # print 'Recall: ', recall_score(y_test, predictions.eval())
 
     print '---TRAIN---'
     print (confusion_matrix(y_train, predictions_train.eval()))
     print 'Accuracy: ', accuracy_score(y_train, predictions_train.eval())
-    print 'Recall: ', recall_score(y_train, predictions_train.eval())
+    # print 'Recall: ', recall_score(y_train, predictions_train.eval())
     plt.show()

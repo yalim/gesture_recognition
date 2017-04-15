@@ -3,10 +3,15 @@ from theano import tensor as T
 import numpy as np
 from sklearn.utils import shuffle
 import matplotlib.pyplot as plt
-from sklearn.datasets import load_digits
-from sklearn.metrics import confusion_matrix, accuracy_score, recall_score
+from sklearn.metrics import confusion_matrix, accuracy_score
 import time
 import csv
+from keras.models import Sequential
+from keras.callbacks import EarlyStopping
+from keras.optimizers import Nadam
+from keras.layers import Merge
+from keras.layers.core import Dense, Activation, Dropout
+from keras.utils.np_utils import to_categorical
 
 
 class HiddenLayer:
@@ -75,8 +80,9 @@ class ANN:
         plt.show()
 
     def forward(self, X):
-        for h in self.hidden_layers_list:
-            X = h.fwd(X)
+        for hu in self.hidden_layers_list:
+            print type(hu)
+            X = hu.fwd(X)
         return T.nnet.softmax(X.dot(self.W) + self.b)
 
     def predict(self, X):
@@ -97,7 +103,7 @@ if __name__ == '__main__':
     with open('../python_denemeler/noisy_data.csv', 'r') as csvfile:
         sensors = csv.reader(csvfile, delimiter=',')
         for row in sensors:
-            if rr > 0 and rr < 70001:
+            if rr > 0 and rr < 214401:
                 sensors_data = map(float, row)
                 x_acc_noise.append(sensors_data[1])
                 y_acc_noise.append(sensors_data[2])
@@ -116,50 +122,72 @@ if __name__ == '__main__':
     y_gyr_noise = np.asarray(y_gyr_noise)
     z_gyr_noise = np.asarray(z_gyr_noise)
 
-    x_acc_noise = np.reshape(x_acc_noise, (700, 100))
-    y_acc_noise = np.reshape(y_acc_noise, (700, 100))
-    z_acc_noise = np.reshape(z_acc_noise, (700, 100))
+    x_acc_noise = np.reshape(x_acc_noise, (2144, 100))
+    y_acc_noise = np.reshape(y_acc_noise, (2144, 100))
+    z_acc_noise = np.reshape(z_acc_noise, (2144, 100))
 
-    x_gyr_noise = np.reshape(x_gyr_noise, (700, 100))
-    y_gyr_noise = np.reshape(y_gyr_noise, (700, 100))
-    z_gyr_noise = np.reshape(z_gyr_noise, (700, 100))
+    x_gyr_noise = np.reshape(x_gyr_noise, (2144, 100))
+    y_gyr_noise = np.reshape(y_gyr_noise, (2144, 100))
+    z_gyr_noise = np.reshape(z_gyr_noise, (2144, 100))
 
     x_noise = np.hstack((x_acc_noise, y_acc_noise, z_acc_noise, x_gyr_noise, y_gyr_noise, z_gyr_noise))
-
-    # with open('./GestureDataset_Padded.csv', 'r') as dataset:
-    #     datas = csv.reader(dataset, delimiter=',')
-    #     x = [map(float, xx) for xx in datas]
-
-    # ##################################
-    # x_np = np.asarray(x)
-    # print x_np[0].shape
-    # print x_np[0]
 
     x = np.genfromtxt('./GestureDataset_Padded.csv', delimiter=',')
     print x[:, 2:].shape
     print x_noise.shape
 
-    yis = np.asarray(700*[0] + x.shape[0]*[1])
+    yis = np.vstack((np.zeros((len(x_noise), 1)), np.ones((len(x), 1))))
     xis = np.vstack((x_noise, x[:, 2:]))
-    xis, yis = shuffle(xis, yis)
-    x_train = xis[:600]
-    y_train = yis[:600]
-    x_test = xis[601:]
-    y_test = yis[601:]
+
+    yis, xis = shuffle(yis, xis)
+
+    x_train = xis[:1000]
+    y_train = yis[:1000]
+    x_test = xis[1001:]
+    y_test = yis[1001:]
 
     start_time = time.time()
 
-    ann2 = ANN([300])
+    # ann2 = ANN([500])
 
-    ann2.fit(x_train, y_train, epochs=150, learning_rate=1e-5)
-    print 'Training Completed.'
-    x_test = theano.shared(x_test, 'x_test')
-    predictions = ann2.predict(x_test)
-    print 'Predictions done!'
+    # ann2.fit(x_train, y_train, epochs=1500, learning_rate=1e-5)
+    # print 'Training Completed.'
 
-    print (confusion_matrix(y_test, predictions.eval()))
-    plt.imshow(confusion_matrix(y_test, predictions.eval()))
-    # plt.show()
-    print 'Accuracy: ', accuracy_score(y_test, predictions.eval())
-    print 'Recall: ', recall_score(y_test, predictions.eval())
-    print("--- %s seconds ---" % (time.time() - start_time))
+    # # Save the network
+    # f = open('ann_gr.save', 'wb')
+    # cPickle.dump(ann2, f, protocol=cPickle.HIGHEST_PROTOCOL)
+    # f.close()
+    # print 'File saved!'
+
+    # x_test = theano.shared(x_test, 'x_test')
+    # predictions = ann2.predict(x_test)
+    # print 'Predictions done!'
+
+    # print (confusion_matrix(y_test, predictions.eval()))
+    # plt.imshow(confusion_matrix(y_test, predictions.eval()))
+    # # plt.show()
+    # print 'Accuracy: ', accuracy_score(y_test, predictions.eval())
+    # print 'Recall: ', recall_score(y_test, predictions.eval())
+    # print("--- %s seconds ---" % (time.time() - start_time))
+
+    model = Sequential()
+    # model.add(Dense(600, activation='linear'))
+    model.add(Dense(100, activation='relu', input_dim=600))
+    model.add(Dense(2, activation='softmax'))
+    early_stopping = EarlyStopping(monitor='val_acc', patience=2)
+    nadam = Nadam(lr=1e-3, beta_1=0.95, beta_2=0.95)
+    model.compile(optimizer=nadam, loss='categorical_crossentropy', metrics=['accuracy'])
+    y_train_cat = to_categorical(y_train)
+    model.fit(x_train, y_train_cat, validation_split=0.3, callbacks=[early_stopping], epochs=100)
+
+    predictions_train = np.argmax(model.predict(x_train), axis=1)
+    predictions_test = np.argmax(model.predict(x_test), axis=1)
+
+    print 'Test Confusion Matrix'
+    print confusion_matrix(y_test, predictions_test)
+    print 'Test Accuracy: ', accuracy_score(y_test, predictions_test)
+    print '----'
+    print 'Train Confusion Matrix'
+    print confusion_matrix(y_train, predictions_train)
+    print 'Test Accuracy: ', accuracy_score(y_train, predictions_train)
+    model.save('noise_vs_gesture_keras_model.h5')
