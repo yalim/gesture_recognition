@@ -16,11 +16,12 @@ def train_and_record(N_LSTM, N_dense, b1, b2, lr):
 
 if __name__ == '__main__':
     # Create list for hyperparameters
-    N_LSTM_list = np.random.randint(10, 100, 20)
-    N_dense_list = np.random.randint(5, 100, 20)
-    b1_list = np.random.uniform(0.7, 1, 5)
-    b2_list = np.random.uniform(0.7, 1, 5)
-    lr_list = np.random.uniform(1e-5, 1e-3, 5)
+    subsample = 2
+    N_LSTM_list = np.random.randint(10, 100, 10)
+    N_dense_list = np.random.randint(5, 100, 10)
+    b1_list = np.random.uniform(0.7, 1, 3)
+    b2_list = np.random.uniform(0.7, 1, 3)
+    lr_list = np.random.uniform(1e-5, 1e-3, 3)
 
     for N_LSTM in N_LSTM_list:
         for N_dense in N_dense_list:
@@ -28,18 +29,18 @@ if __name__ == '__main__':
                 for b2 in b2_list:
                     for lr in lr_list:
                         model_x_acc = Sequential()
-                        model_x_acc.add(LSTM(N_LSTM, input_shape=(100, 1)))
+                        model_x_acc.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
                         model_y_acc = Sequential()
-                        model_y_acc.add(LSTM(N_LSTM, input_shape=(100, 1)))
+                        model_y_acc.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
                         model_z_acc = Sequential()
-                        model_z_acc.add(LSTM(N_LSTM, input_shape=(100, 1)))
+                        model_z_acc.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
 
                         model_x_gyr = Sequential()
-                        model_x_gyr.add(LSTM(N_LSTM, input_shape=(100, 1)))
+                        model_x_gyr.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
                         model_y_gyr = Sequential()
-                        model_y_gyr.add(LSTM(N_LSTM, input_shape=(100, 1)))
+                        model_y_gyr.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
                         model_z_gyr = Sequential()
-                        model_z_gyr.add(LSTM(N_LSTM, input_shape=(100, 1)))
+                        model_z_gyr.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
 
                         merged = Merge([model_x_acc,
                                         model_y_acc,
@@ -112,11 +113,11 @@ if __name__ == '__main__':
                         acc_list = ['N_LSTM', N_LSTM, 'N_dense', N_dense, 'b1', b1, 'b2', b2, 'lr', lr, 'train_acc', train_acc, 'test_acc', test_acc, 'val_acc', val_acc]
                         acc_list2 = np.atleast_2d(np.asarray([N_LSTM, N_dense, b1, b2, lr, train_acc, test_acc, val_acc]))
 
-                        with open('accuracies.csv', 'a') as gdata:
+                        with open('accuracies_25hz.csv', 'a') as gdata:
                             np.savetxt(gdata, acc_list2, delimiter=',', fmt='%d %d %3f %3f %3f %3f %3f %3f')
                         gdata.close()
 
-                        final_model.save('gr_keras_lstm_dense_'+str(N_LSTM)+'_'+str(N_dense)+'_'+str(b1)+'_'+str(b2)+'_'+str(lr)+'h5')
+                        # final_model.save('gr_keras_lstm_dense_'+str(N_LSTM)+'_'+str(N_dense)+'_'+str(b1)+'_'+str(b2)+'_'+str(lr)+'h5')
 
 
     # print 'Trained Users: ', set(user_ids)

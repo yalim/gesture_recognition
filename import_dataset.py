@@ -5,14 +5,15 @@ def load_data(filename):
     return np.genfromtxt('./'+filename+'.csv', delimiter=',')
 
 # Import the dataset
+subsample = 2
 y = load_data('labels')
 user_ids = np.asarray(map(int, load_data('user_ids')))
-x_accel = load_data('x_acc_noise').reshape((y.shape[0], 100, 1))
-y_accel = load_data('y_acc_noise').reshape((y.shape[0], 100, 1))
-z_accel = load_data('z_acc_noise').reshape((y.shape[0], 100, 1))
-x_gyro = load_data('x_gyr_noise').reshape((y.shape[0], 100, 1))
-y_gyro = load_data('y_gyr_noise').reshape((y.shape[0], 100, 1))
-z_gyro = load_data('z_gyr_noise').reshape((y.shape[0], 100, 1))
+x_accel = load_data('x_acc_noise')[0::subsample].reshape((y.shape[0], 100 / subsample, 1))
+y_accel = load_data('y_acc_noise')[0::subsample].reshape((y.shape[0], 100 / subsample, 1))
+z_accel = load_data('z_acc_noise')[0::subsample].reshape((y.shape[0], 100 / subsample, 1))
+x_gyro = load_data('x_gyr_noise')[0::subsample].reshape((y.shape[0], 100 / subsample, 1))
+y_gyro = load_data('y_gyr_noise')[0::subsample].reshape((y.shape[0], 100 / subsample, 1))
+z_gyro = load_data('z_gyr_noise')[0::subsample].reshape((y.shape[0], 100 / subsample, 1))
 
 # Choose users to be in validation, test and training sets
 val_cond = [(6 == user_ids) | (3 == user_ids)]

@@ -10,24 +10,25 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 from import_dataset import x_accel_test, x_accel_validation, x_accel_train, y_accel_test, y_accel_validation, y_accel_train, z_accel_test, z_accel_validation, z_accel_train, x_gyro_test, x_gyro_validation, x_gyro_train, y_gyro_test, y_gyro_validation, y_gyro_train, z_gyro_test, z_gyro_validation, z_gyro_train, y_test, y_validation, y_train
 
 if __name__ == '__main__':
-    N_dense = 99
-    N_LSTM = 44
+    subsample = 2
+    N_dense = 60
+    N_LSTM = 40
     lr = 9.7e-4
-    b1 = 0.841
-    b2 = 0.887
+    b1 = 0.9
+    b2 = 0.9
     model_x_acc = Sequential()
-    model_x_acc.add(LSTM(N_LSTM, input_shape=(100, 1)))
+    model_x_acc.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
     model_y_acc = Sequential()
-    model_y_acc.add(LSTM(N_LSTM, input_shape=(100, 1)))
+    model_y_acc.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
     model_z_acc = Sequential()
-    model_z_acc.add(LSTM(N_LSTM, input_shape=(100, 1)))
+    model_z_acc.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
 
     model_x_gyr = Sequential()
-    model_x_gyr.add(LSTM(N_LSTM, input_shape=(100, 1)))
+    model_x_gyr.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
     model_y_gyr = Sequential()
-    model_y_gyr.add(LSTM(N_LSTM, input_shape=(100, 1)))
+    model_y_gyr.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
     model_z_gyr = Sequential()
-    model_z_gyr.add(LSTM(N_LSTM, input_shape=(100, 1)))
+    model_z_gyr.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
 
     merged = Merge([model_x_acc,
                     model_y_acc,
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     final_model.add(merged)
     final_model.add(Dense(N_dense, activation='relu'))
     final_model.add(Dense(9, activation='softmax'))
-    early_stopping = EarlyStopping(monitor='val_acc', patience=1)
+    early_stopping = EarlyStopping(monitor='val_acc', patience=2)
     nadam = Nadam(lr=lr, beta_1=b1, beta_2=b2)
     final_model.compile(optimizer=nadam, loss='categorical_crossentropy', metrics=['accuracy'])
     y_train_c = to_categorical(y_train)
@@ -95,5 +96,5 @@ if __name__ == '__main__':
     print 'Train Accuracy: ', accuracy_score(y_train, predictions_train)
     train_acc = accuracy_score(y_train, predictions_train)
     val_acc = accuracy_score(y_validation, predictions_val)
-    final_model.save("gr_keras_lstm_dense.h5")
-    final_model.save_weights('gr_keras_weights.h5')
+    final_model.save("gr_keras_lstm_dense_25hz.h5")
+    final_model.save_weights('gr_keras_weights_25hz.h5')
