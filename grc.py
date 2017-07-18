@@ -96,3 +96,4 @@ if __name__ == '__main__':
     train_acc = accuracy_score(y_train, predictions_train)
     val_acc = accuracy_score(y_validation, predictions_val)
     final_model.save("gr_keras_lstm_dense.h5")
+    final_model.save_weights('gr_keras_weights.h5')

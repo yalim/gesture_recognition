@@ -68,13 +68,24 @@ class fifo_array():
             self.max_len = new_length
         else:
             x = [y for y in range(self.max_len - new_length)]
-            print x
+            print(x)
             self.arr4 = np.delete(self.arr, x, 1)
             self.arr = self.arr4
             self.max_len = new_length
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 if __name__ == '__main__':
     x = fifo_array(10)
     for a in range(20):
         x.add_element(a)
-        print x.get_value()
+        print(x.get_value())
