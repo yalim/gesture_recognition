@@ -9,6 +9,7 @@ from keras.models import Sequential
 from keras.layers import Merge
 from keras.layers.core import Dense
 from keras.layers.recurrent import LSTM
+# import warnings
 
 
 def most_common(lst):
@@ -17,9 +18,10 @@ def most_common(lst):
 
 if __name__ == '__main__':
     # Initialize the final model and load weights
+    # warnings.simfplefilter('default')
     subsample = 1
-    N_dense = 60
-    N_LSTM = 40
+    N_dense = 99  # 60 for subsample 2
+    N_LSTM = 44  # 40 for subsample 2
     model_x_acc = Sequential()
     model_x_acc.add(LSTM(N_LSTM, input_shape=(100 / subsample, 1)))
     model_y_acc = Sequential()
@@ -107,13 +109,16 @@ if __name__ == '__main__':
             # Predict noise vs gesture then gesture classification
 
             x = np.hstack((x_accel_np, y_accel_np, z_accel_np, x_gyro_np, y_gyro_np, z_gyro_np))
-            x_60 = np.hstack((x_gyro_np[0, 100:], y_gyro_np[0, 100:], z_gyro_np[0, 100:]))
+            x_60 = np.hstack((x_gyro.get_value()[0, 100:], x_gyro.get_value()[0, 100:], x_gyro.get_value()[0, 100:]))
+            # print(x_60)
             std_dev = np.std(x_60)
+            # print(std_dev)
 
             prediction = np.argmax(noise_vs_gesture.predict(x), axis=1)
-            print('Noise vs gesture prob: ' + str(noise_vs_gesture.predict(x)))
+            probability_of_gesture = noise_vs_gesture.predict(x)
+            # print('Noise vs gesture prob: ' + str(probability_of_gesture))
 
-            if prediction[0] > 0.5:
+            if probability_of_gesture[0, 1] > 0.9:  # Put a threshold to gesture probability
                 gesture_detected = True
                 # print(bcolors.WARNING + 'Gesture!!' + bcolors.ENDC)
 
@@ -124,7 +129,7 @@ if __name__ == '__main__':
                                                     y_gyro_np.reshape((1, 100 / subsample, 1)),
                                                     z_gyro_np.reshape((1, 100 / subsample, 1))])
 
-                if np.amax(probabilities, axis=1) > 0.8 and std_dev < 1.0:  # Check sureness of the gesture detection and if gesture is finished.
+                if np.amax(probabilities, axis=1) > 0.8 and std_dev < 0.5:  # Check sureness of the gesture detection and if gesture is finished.
                     classification = np.argmax(probabilities, axis=1)
                     gesture_vote.append(classification[0])
                     # print(bcolors.WARNING + 'Probability: ' +
@@ -156,6 +161,16 @@ if __name__ == '__main__':
 #  [ 0.  2.  0.  0.  0.  1.  0.  6.  1.]]
 # 0.32
 
+# [[ 5.  0.  3.  0.  0.  0.  2.  0.  0.]
+#  [ 0.  2.  1.  0.  0.  1.  0.  6.  0.]
+#  [ 2.  3.  1.  0.  0.  0.  0.  4.  0.]
+#  [ 0.  3.  5.  2.  0.  0.  0.  0.  0.]
+#  [ 0.  2.  0.  1.  3.  0.  0.  4.  0.]
+#  [ 0.  1.  0.  0.  1.  3.  0.  2.  3.]
+#  [ 0.  0.  0.  0.  0.  0.  5.  4.  1.]
+#  [ 1.  0.  1.  0.  0.  0.  3.  5.  0.]
+#  [ 0.  2.  0.  0.  0.  0.  0.  7.  1.]]
+# Accuracy: 0.3
 
 # 25 Hz
 # [[  2.   0.   0.   0.   0.   0.   1.   7.   0.]
