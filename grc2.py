@@ -8,9 +8,10 @@ def plot_confusion_matrix(cm, classes,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues):
     """
-    This function prints and plots the confusion matrix.
+    Print and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
+
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     # plt.title(title)
     plt.colorbar()
@@ -38,15 +39,25 @@ def plot_confusion_matrix(cm, classes,
 
 
 if __name__ == '__main__':
-    a = np.asarray([[60, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 58, 0, 0, 0, 0, 2, 0, 0],
-                [0, 0, 60, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 60, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 60, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 60, 0, 0, 0],
-                [1, 0, 0, 0, 1, 0, 27, 0, 31],
-                [0, 1, 0, 2, 0, 0, 1, 56, 0],
-                [0, 0, 0, 0, 3, 0, 2, 0, 55]])
+    a = np.asarray([[10., 0., 0., 0., 0., 0., 0., 0., 0.]
+                    [1., 9., 0., 0., 0., 0., 0., 0., 0.]
+                    [1., 0., 6., 2., 0., 0., 0., 1., 0.]
+                    [0., 0., 2., 4., 0., 0., 0., 4., 0.]
+                    [0., 0., 0., 0., 7., 0., 0., 2., 1.]
+                    [0., 0., 1., 0., 0., 7., 0., 2., 0.]
+                    [1., 0., 0., 0., 0., 0., 4., 5., 0.]
+                    [1., 0., 0., 0., 0., 0., 0., 9., 0.]
+                    [1., 0., 0., 0., 0., 0., 4., 2., 3.]])
     gest_list = ['CCW Circle', 'CW Circle', 'Move Up', 'Move Down', 'Move Right', 'Move Left', 'CCW Triangle', 'CW Triangle', 'Letter Z']
     plot_confusion_matrix(a, gest_list)
     plt.show()
+
+# [[10., 0., 0., 0., 0., 0., 0., 0., 0.]
+#  [1., 9., 0., 0., 0., 0., 0., 0., 0.]
+#  [1., 0., 6., 2., 0., 0., 0., 1., 0.]
+#  [0., 0., 2., 4., 0., 0., 0., 4., 0.]
+#  [0., 0., 0., 0., 7., 0., 0., 2., 1.]
+#  [0., 0., 1., 0., 0., 7., 0., 2., 0.]
+#  [1., 0., 0., 0., 0., 0., 4., 5., 0.]
+#  [1., 0., 0., 0., 0., 0., 0., 9., 0.]
+#  [1., 0., 0., 0., 0., 0., 4., 2., 3.]]
