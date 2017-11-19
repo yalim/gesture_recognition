@@ -5,7 +5,7 @@ def load_data(filename):
     return np.genfromtxt('./'+filename+'.csv', delimiter=',')
 
 # Import the dataset
-subsample = 2
+subsample = 1
 y = load_data('labels')
 user_ids = np.asarray(map(int, load_data('user_ids')))
 x_accel = load_data('x_acc_noise')[0::subsample].reshape((y.shape[0], 100 / subsample, 1))

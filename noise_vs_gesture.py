@@ -101,7 +101,7 @@ if __name__ == '__main__':
     z_gyr_noise = []
     subsample = 2
     rr = 0
-    with open('../python_denemeler/noisy_data.csv', 'r') as csvfile:
+    with open('./sensor_info/noisy_data.csv', 'r') as csvfile:
         sensors = csv.reader(csvfile, delimiter=',')
         for row in sensors:
             if rr > 0 and rr < (214400 / subsample) + 1:
