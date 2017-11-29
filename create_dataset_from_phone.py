@@ -1,7 +1,7 @@
 """Import csv. and form dataset"""
 import csv
 import numpy as np
-import sys
+import matplotlib.pyplot as plt
 
 
 # File location and file names
@@ -68,3 +68,9 @@ for file_name in files:  # for each gesture
                                   np.atleast_2d(zm_r[x * 100: x * 100 + 100])[::-1], axis=1)
             with open(gesture_list[files.index(file_name)] + '.csv', 'a') as gdata:
                 np.savetxt(gdata, data, delimiter=',')
+            gdata.close()
+        plt.figure(1)
+        plt.plot(z_accel)
+        plt.figure(2)
+        plt.plot(data)
+        plt.show()
