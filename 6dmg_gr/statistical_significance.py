@@ -18,7 +18,7 @@ from keras.preprocessing.sequence import pad_sequences
 from scipy.io import loadmat
 import os
 import sqlite3
-from grc2 import plot_confusion_matrix
+# from grc2 import plot_confusion_matrix
 
 
 # np.set_printoptions(precision=3, threshold=np.nan, suppress=True)
