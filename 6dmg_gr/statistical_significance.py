@@ -159,10 +159,10 @@ xTest = npzfile['xTest']
 yTest = npzfile['yTest']
 
 
-repetition = 1
-epochs = 2
+repetition = 50
+epochs = 100
 patience = 3
-batch_size=700
+batch_size=100
 
 # Model 1
 C = [36, 37, 75]
